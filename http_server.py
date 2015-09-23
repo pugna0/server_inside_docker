@@ -10,12 +10,10 @@ class TestHTTPHandler(BaseHTTPRequestHandler):
 
         self.send_response(200)
 
-        self.send_header("Welcome", "Contect")
-
-        self.end_headers()
-
-        self.wfile.write(buf)
-
+        if self.path == "sent_test":
+            f = open("/home/pugna/sent_test", "rb")
+            self.wfile.write(f.read())
+            f.close()
 
 
 
