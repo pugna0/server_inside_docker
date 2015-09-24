@@ -9,6 +9,7 @@ class TestHTTPHandler(BaseHTTPRequestHandler):
         self.protocal_version = "HTTP/1.1"
 
         self.send_response(200)
+        print self.headers.get('Range', None)
         print "~~~~~~"
         """
         print dir(self.headers)
@@ -20,11 +21,9 @@ class TestHTTPHandler(BaseHTTPRequestHandler):
         print self.headers.getplist()
         """
         seek_size = 0
-        for content in self.headers.items():
-            if content[0] == "range":
-                off_set = content[1].split("=")[1]
-                seek_size = int(off_set.split("-")[0])
-                print seek_size
+        if self.headers.get('Range', None):
+            seek_size = int((self.headers.get('Range', None).split("=")[1]).split("-")[0])
+            print seek_size
         print "~~~~~~"
         self.send_header("header", "Content")
         self.end_headers()
