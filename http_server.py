@@ -9,10 +9,32 @@ class TestHTTPHandler(BaseHTTPRequestHandler):
         self.protocal_version = "HTTP/1.1"
 
         self.send_response(200)
+        print "~~~~~~"
+        """
+        print dir(self.headers)
+        print self.headers.items()
+        print self.headers.keys()
+        print self.headers.has_key("range")
 
-        if self.path == "sent_test":
+        print self.headers.values()
+        print self.headers.getplist()
+        """
+        seek_size = 0
+        for content in self.headers.items():
+            if content[0] == "range":
+                off_set = content[1].split("=")[1]
+                seek_size = int(off_set.split("-")[0])
+                print seek_size
+        print "~~~~~~"
+        self.send_header("header", "Content")
+        self.end_headers()
+        if self.path.split("/")[1] == "sent_test":
+
             f = open("/home/pugna/sent_test", "rb")
-            self.wfile.write(f.read())
+            if seek_size:
+                f.seek(seek_size)
+                print f.tell()
+                self.wfile.write(f.read())
             f.close()
 
 
