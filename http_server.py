@@ -1,4 +1,5 @@
 from BaseHTTPServer import HTTPServer, BaseHTTPRequestHandler
+from httplib import HTTPConnection
 __author__ = 'pugna'
 
 class TestHTTPHandler(BaseHTTPRequestHandler):
@@ -38,8 +39,23 @@ class TestHTTPHandler(BaseHTTPRequestHandler):
 
 
 
+
     def get_file_from_agent(self):
-        pass
+        #HTTPConnection.request()
+        conn = HTTPConnection("www.g.com", 80, False)
+        conn.request('get', '/', headers = {"Host": "www.google.com",
+                                    "User-Agent": "Mozilla/5.0 (Windows; U; Windows NT 5.1; zh-CN; rv:1.9.1) Gecko/20090624 Firefox/3.5",
+                                    "Accept": "text/plain"})
+        res = conn.getresponse()
+        print 'version:', res.version
+        print 'reason:', res.reason
+        print 'status:', res.status
+        print 'msg:', res.msg
+        print 'headers:', res.getheaders()
+        #html
+        #print '\n' + '-' * 50 + '\n'
+        #print res.read()
+        conn.close()
 
 
     def cache_file(self):
