@@ -1,5 +1,5 @@
 from BaseHTTPServer import HTTPServer, BaseHTTPRequestHandler
-
+import zlib
 __author__ = 'pugna'
 
 class TestHTTPHandler(BaseHTTPRequestHandler):
@@ -36,9 +36,10 @@ class TestHTTPHandler(BaseHTTPRequestHandler):
                 self.wfile.write(f.read())
             f.close()
 
-    def compress(self):
-        pass
-
+    def compress(self, str):
+        zip_str = zlib.compress(str)
+        zip_len = len(zip_str)
+        return zip_str, zip_len
     def slice_blk(self):
         pass
 
