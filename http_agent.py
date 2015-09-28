@@ -1,6 +1,7 @@
 from BaseHTTPServer import HTTPServer, BaseHTTPRequestHandler
 import zlib
-import pycurl
+import os
+
 
 __author__ = 'pugna'
 
@@ -25,25 +26,51 @@ class TestHTTPHandler(BaseHTTPRequestHandler):
         seek_size = 0
         if self.headers.get('Range', None):
             seek_size = int((self.headers.get('Range', None).split("=")[1]).split("-")[0])
-            print seek_size
+        self.send_file(seek_size)
         print "~~~~~~"
-        self.send_header("header", "Content")
+
+    def send_file(self, seek_size):
+        path = self.path.split("/")[1]
+        buff = self.construct_file(path, seek_size)
         self.end_headers()
-        if self.path.split("/")[1] == "sent_test":
+        self.wfile.write(buff)
 
-            f = open("/home/pugna/sent_test", "rb")
-            if seek_size:
-                f.seek(seek_size)
-                print f.tell()
-                self.wfile.write(f.read())
-            f.close()
-
+    @staticmethod
     def compress(self, str):
         zip_str = zlib.compress(str)
         zip_len = len(zip_str)
         return zip_str, zip_len
-    def slice_blk(self):
-        pass
+
+    def construct_file(self, path, start_pos=0):
+        f = open(path, "rb")
+        size = os.path.getsize(path)
+        if start_pos >= size:
+            return None, 0
+        send_file = ''
+        compress_size = 0
+        if start_pos:
+            f.seek(start_pos)
+            read_size = size / 10
+            if size % 10 != 0:
+                read_size = size/10 + 1
+            for i in range(1, 11):
+                tmp = f.read(read_size)
+                com_str = self.compress(tmp)
+                send_file += com_str
+                f.seek(i * read_size + start_pos)
+        else:
+            read_size = size / 10
+            if size % 10 != 0:
+                read_size = size/10 + 1
+            for i in range(1, 11):
+                tmp = f.read(read_size)
+                com_str = self.compress(tmp)
+                send_file += com_str
+                f.seek(i * read_size)
+            compress_size = read_size
+        self.send_header("compress_size", compress_size)
+        return send_file, compress_size
+
 
 def start_server(port):
     http_server = HTTPServer(('127.0.0.1', int(port)), TestHTTPHandler)
@@ -52,8 +79,3 @@ def start_server(port):
 if __name__ == "__main__":
     start_server(8765)
 
-
-"""
-c = pycurl.Curl()
-c.setopt(pycurl.RESUME_FROM_LARGE, location)
-"""
