@@ -1,5 +1,7 @@
 from BaseHTTPServer import HTTPServer, BaseHTTPRequestHandler
 import zlib
+import pycurl
+
 __author__ = 'pugna'
 
 class TestHTTPHandler(BaseHTTPRequestHandler):
@@ -49,3 +51,9 @@ def start_server(port):
 
 if __name__ == "__main__":
     start_server(8765)
+
+
+"""
+c = pycurl.Curl()
+c.setopt(pycurl.RESUME_FROM_LARGE, location)
+"""

@@ -1,7 +1,7 @@
 from BaseHTTPServer import HTTPServer, BaseHTTPRequestHandler
 from httplib import HTTPConnection
 import zlib
-
+import pycurl
 
 __author__ = 'pugna'
 
@@ -50,7 +50,7 @@ class TestHTTPHandler(BaseHTTPRequestHandler):
         #conn.request('get', dir, headers = {"Host": "www.google.com",
         #                            "User-Agent": "Mozilla/5.0 (Windows; U; Windows NT 5.1; zh-CN; rv:1.9.1) Gecko/20090624 Firefox/3.5",
         #                            "Accept": "text/plain"})
-        
+
         res = conn.getresponse()
         print 'version:', res.version
         print 'reason:', res.reason
