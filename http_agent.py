@@ -59,7 +59,7 @@ class TestHTTPHandler(BaseHTTPRequestHandler):
                 read_size = size/10 + 1
             for i in range(1, 11):
                 tmp = f.read(read_size)
-                com_str = self.compress(tmp)
+                com_str, com_size = self.compress(tmp)
                 send_file += com_str
                 f.seek(i * read_size)
             compress_size = read_size

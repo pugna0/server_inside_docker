@@ -50,6 +50,7 @@ class TestHTTPHandler(BaseHTTPRequestHandler):
         print "~~~~~~"
 #       self.send_header("header", "Content")
         self.end_headers()
+        #send file_response to client who uses "curl"
 
     @staticmethod
     def get_file_from_agent(dir_, seek_size):
@@ -63,14 +64,17 @@ class TestHTTPHandler(BaseHTTPRequestHandler):
         if seek_size:
             c.setopt(pycurl.RESUME_FROM_LARGE, seek_size)
             c.setopt(pycurl.HTTPHEADER, ["Range:%s" % seek_size])
-        c.setopt(c.WRITEDATA, buffer_)
+        c.setopt(pycurl.WRITEFUNCTION, buffer_.write)
         #c.setopt(c.WRITEFUNCTION, retrieved_body.store)
         #c.setopt(c.HEADERFUNCTION, retrieved_headers.store)
         c.perform()
         c.close()
         #print retrieved_body
-        print buffer_
-        return buffer_, 0
+        ret = str(buffer_.getvalue()) + '\0'
+        print ret
+
+        #it should be return com_size which is in response's header
+        return ret, 0
 
 
     @staticmethod
@@ -93,14 +97,11 @@ class TestHTTPHandler(BaseHTTPRequestHandler):
         finally:
             conn.close()
 
-        print res
-
         return res, compress_size
 
     @staticmethod
     def decompress_(str_, decom_size):
         dst_file = ''
-        print str_
         for i in range(1, 11):
             content = str_[decom_size*(i-1):decom_size*i]
             dezip_str = zlib.decompress(content)
