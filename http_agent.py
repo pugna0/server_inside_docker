@@ -17,7 +17,8 @@ class TestHTTPHandler(BaseHTTPRequestHandler):
         self.send_response(200)
         seek_size = 0
         if self.headers.get('Range', None):
-            seek_size = int((self.headers.get('Range', None).split("=")[1]).split("-")[0])
+            #seek_size = int((self.headers.get('Range', None).split("=")[1]).split("-")[0])
+            seek_size = int(self.headers.get('Range', None))
         self.send_file(seek_size)
         print "~~~~~~"
 

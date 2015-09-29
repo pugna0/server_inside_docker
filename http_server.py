@@ -52,7 +52,7 @@ class TestHTTPHandler(BaseHTTPRequestHandler):
         self.end_headers()
 
     @staticmethod
-    def get_file_from_agent1(dir_, seek_size):
+    def get_file_from_agent(dir_, seek_size):
         #retrieved_body = Storage()
         #retrieved_headers = Storage()
 
@@ -62,6 +62,7 @@ class TestHTTPHandler(BaseHTTPRequestHandler):
         buffer_ = StringIO()
         if seek_size:
             c.setopt(pycurl.RESUME_FROM_LARGE, seek_size)
+            c.setopt(pycurl.HTTPHEADER, ["Range:%s" % seek_size])
         c.setopt(c.WRITEDATA, buffer_)
         #c.setopt(c.WRITEFUNCTION, retrieved_body.store)
         #c.setopt(c.HEADERFUNCTION, retrieved_headers.store)
@@ -69,11 +70,11 @@ class TestHTTPHandler(BaseHTTPRequestHandler):
         c.close()
         #print retrieved_body
         print buffer_
-        return buffer_
+        return buffer_, 0
 
 
     @staticmethod
-    def get_file_from_agent(dir_, seek_size):
+    def get_file_from_agent1(dir_, seek_size):
         url = "http://127.0.0.1:8765/" + dir_
         header_data = ''
         conn = httplib.HTTPConnection("127.0.0.1")
