@@ -8,24 +8,13 @@ __author__ = 'pugna'
 
 WORK_DIR = '/home/pugna/'
 
+
 class TestHTTPHandler(BaseHTTPRequestHandler):
 
     def do_GET(self):
-        buf = "It works"
         self.protocal_version = "HTTP/1.1"
 
         self.send_response(200)
-        print self.headers.get('Range', None)
-        print "~~~~~~"
-        """
-        print dir(self.headers)
-        print self.headers.items()
-        print self.headers.keys()
-        print self.headers.has_key("range")
-
-        print self.headers.values()
-        print self.headers.getplist()
-        """
         seek_size = 0
         if self.headers.get('Range', None):
             seek_size = int((self.headers.get('Range', None).split("=")[1]).split("-")[0])
@@ -36,6 +25,7 @@ class TestHTTPHandler(BaseHTTPRequestHandler):
         path = self.path.split("/")[1]
         buff = self.construct_file(path, seek_size)
         self.end_headers()
+        #print buff
         self.wfile.write(buff)
 
     @staticmethod

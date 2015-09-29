@@ -2,18 +2,30 @@ from BaseHTTPServer import HTTPServer, BaseHTTPRequestHandler
 import zlib
 import pycurl
 from StringIO import StringIO
+import httplib
+
 __author__ = 'pugna'
+
+
+class Storage:
+    def __init__(self):
+        self.contents = ''
+        self.line = 0
+
+    def store(self, buf):
+        self.line = self.line + 1
+        self.contents = "%s%i: %s" % (self.contents, self.line, buf)
+
+    def __str__(self):
+        return self.contents
 
 
 class TestHTTPHandler(BaseHTTPRequestHandler):
 
     def do_GET(self):
-
-        buf = "It works"
         self.protocal_version = "HTTP/1.1"
 
         self.send_response(200)
-        print self.headers.get('Range', None)
         print "~~~~~~"
         """
         print dir(self.headers)
@@ -34,13 +46,16 @@ class TestHTTPHandler(BaseHTTPRequestHandler):
         else:
             buff = self.get_file_from_agent(self.path.split("/")[1], 0)
             file_response = self.decompress_(buff, self.headers.get('compress_size', None))
-
+        print file_response
         print "~~~~~~"
 #       self.send_header("header", "Content")
         self.end_headers()
 
     @staticmethod
-    def get_file_from_agent(dir_, seek_size):
+    def get_file_from_agent1(dir_, seek_size):
+        #retrieved_body = Storage()
+        #retrieved_headers = Storage()
+
         c = pycurl.Curl()
         url = "127.0.0.1:8765/" + dir_
         c.setopt(c.URL, url)
@@ -48,8 +63,29 @@ class TestHTTPHandler(BaseHTTPRequestHandler):
         if seek_size:
             c.setopt(pycurl.RESUME_FROM_LARGE, seek_size)
         c.setopt(c.WRITEDATA, buffer_)
+        #c.setopt(c.WRITEFUNCTION, retrieved_body.store)
+        #c.setopt(c.HEADERFUNCTION, retrieved_headers.store)
         c.perform()
+        c.close()
+        #print retrieved_body
+        print buffer_
         return buffer_
+
+
+    @staticmethod
+    def get_file_from_agent(dir_, seek_size):
+        url = "http://127.0.0.1:8765/" + dir_
+        header_data = ''
+        conn = httplib.HTTPConnection("127.0.0.1")
+        if seek_size:
+            #conn.putheader("Range", seek_size)
+            header_data = {"range": seek_size}
+
+        conn.request(method="GET", url=url, headers=header_data)
+        response = conn.getresponse()
+        res= response.read()
+        print res
+        return res
 
     @staticmethod
     def decompress_(str_, decom_size):
@@ -69,8 +105,3 @@ def start_server(port):
 
 if __name__ == "__main__":
     start_server(8766)
-
-"""
-c = pycurl.Curl()
-c.setopt(pycurl.RESUME_FROM_LARGE, location)
-"""
