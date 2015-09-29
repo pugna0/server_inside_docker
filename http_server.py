@@ -30,17 +30,17 @@ class TestHTTPHandler(BaseHTTPRequestHandler):
             seek_size = int((self.headers.get('Range', None).split("=")[1]).split("-")[0])
 
             buff = self.get_file_from_agent(self.path.split("/")[1], seek_size)
-            file_response = self.decompress(buff, self.headers.get('compress_size', None))
+            file_response = self.decompress_(buff, self.headers.get('compress_size', None))
         else:
             buff = self.get_file_from_agent(self.path.split("/")[1], 0)
-            file_response = self.decompress(buff, self.headers.get('compress_size', None))
+            file_response = self.decompress_(buff, self.headers.get('compress_size', None))
 
         print "~~~~~~"
 #       self.send_header("header", "Content")
         self.end_headers()
 
     @staticmethod
-    def get_file_from_agent(self, dir_, seek_size):
+    def get_file_from_agent(dir_, seek_size):
         c = pycurl.Curl()
         url = "127.0.0.1:8765/" + dir_
         c.setopt(c.URL, url)
@@ -52,9 +52,9 @@ class TestHTTPHandler(BaseHTTPRequestHandler):
         return buffer_
 
     @staticmethod
-    def decompress(self, str, decom_size):
+    def decompress_(str_, decom_size):
         dst_file = ''
-        with open(str, 'rb') as f:
+        with open(str_, 'rb') as f:
             for i in range(1, 11):
                 content = f.read(decom_size)
                 f.seek(decom_size*i)

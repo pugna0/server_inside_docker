@@ -5,6 +5,9 @@ import os
 
 __author__ = 'pugna'
 
+
+WORK_DIR = '/home/pugna/'
+
 class TestHTTPHandler(BaseHTTPRequestHandler):
 
     def do_GET(self):
@@ -36,12 +39,13 @@ class TestHTTPHandler(BaseHTTPRequestHandler):
         self.wfile.write(buff)
 
     @staticmethod
-    def compress(self, str):
+    def compress(str):
         zip_str = zlib.compress(str)
         zip_len = len(zip_str)
         return zip_str, zip_len
 
     def construct_file(self, path, start_pos=0):
+        path = WORK_DIR + path
         f = open(path, "rb")
         size = os.path.getsize(path)
         if start_pos >= size:
@@ -55,7 +59,7 @@ class TestHTTPHandler(BaseHTTPRequestHandler):
                 read_size = size/10 + 1
             for i in range(1, 11):
                 tmp = f.read(read_size)
-                com_str = self.compress(tmp)
+                com_str, com_size = self.compress(tmp)
                 send_file += com_str
                 f.seek(i * read_size + start_pos)
         else:
