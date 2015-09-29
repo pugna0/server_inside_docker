@@ -81,7 +81,7 @@ class TestHTTPHandler(BaseHTTPRequestHandler):
         compress_size = 0
         if seek_size:
             #conn.putheader("Range", seek_size)
-            header_data = {"range": seek_size}
+            header_data = {"Range": seek_size}
         try:
             conn.request(method="GET", url=url, headers=header_data)
             response = conn.getresponse()
