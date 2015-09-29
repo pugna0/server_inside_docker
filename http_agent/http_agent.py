@@ -1,3 +1,4 @@
+#!/usr/bin/env python2
 from BaseHTTPServer import HTTPServer, BaseHTTPRequestHandler
 import zlib
 import os
@@ -6,8 +7,8 @@ import os
 __author__ = 'pugna'
 
 
-WORK_DIR = '/home/pugna/'
-
+#WORK_DIR = '/home/pugna/'
+WORK_DIR = '/pro_dir/'
 
 class TestHTTPHandler(BaseHTTPRequestHandler):
 
