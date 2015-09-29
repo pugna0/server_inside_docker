@@ -25,7 +25,7 @@ class TestHTTPHandler(BaseHTTPRequestHandler):
         path = self.path.split("/")[1]
         buff = self.construct_file(path, seek_size)
         self.end_headers()
-        #print buff
+        print buff
         self.wfile.write(buff)
 
     @staticmethod

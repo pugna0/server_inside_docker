@@ -41,11 +41,11 @@ class TestHTTPHandler(BaseHTTPRequestHandler):
         if self.headers.get('Range', None):
             seek_size = int((self.headers.get('Range', None).split("=")[1]).split("-")[0])
 
-            buff = self.get_file_from_agent(self.path.split("/")[1], seek_size)
-            file_response = self.decompress_(buff, self.headers.get('compress_size', None))
+            buff, compress_size = self.get_file_from_agent(self.path.split("/")[1], seek_size)
+            file_response = self.decompress_(buff, int(compress_size))
         else:
-            buff = self.get_file_from_agent(self.path.split("/")[1], 0)
-            file_response = self.decompress_(buff, self.headers.get('compress_size', None))
+            buff, compress_size = self.get_file_from_agent(self.path.split("/")[1], 0)
+            file_response = self.decompress_(buff, int(compress_size))
         print file_response
         print "~~~~~~"
 #       self.send_header("header", "Content")
@@ -77,25 +77,33 @@ class TestHTTPHandler(BaseHTTPRequestHandler):
         url = "http://127.0.0.1:8765/" + dir_
         header_data = ''
         conn = httplib.HTTPConnection("127.0.0.1")
+        res = ''
+        compress_size = 0
         if seek_size:
             #conn.putheader("Range", seek_size)
             header_data = {"range": seek_size}
+        try:
+            conn.request(method="GET", url=url, headers=header_data)
+            response = conn.getresponse()
+            compress_size = response.getheader("compress_size", 0)
+            res = response.read()
+        except Exception, e:
+            print e
+        finally:
+            conn.close()
 
-        conn.request(method="GET", url=url, headers=header_data)
-        response = conn.getresponse()
-        res= response.read()
         print res
-        return res
+
+        return res, compress_size
 
     @staticmethod
     def decompress_(str_, decom_size):
         dst_file = ''
-        with open(str_, 'rb') as f:
-            for i in range(1, 11):
-                content = f.read(decom_size)
-                f.seek(decom_size*i)
-                dezip_str = zlib.decompress(content)
-                dst_file += dezip_str
+        print str_
+        for i in range(1, 11):
+            content = str_[decom_size*(i-1):decom_size*i]
+            dezip_str = zlib.decompress(content)
+            dst_file += dezip_str
         return dst_file
 
 

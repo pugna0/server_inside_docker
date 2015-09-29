@@ -11,8 +11,10 @@ RUN pip install pycurl
 COPY . /pro_dir
 WORKDIR /pro_dir
 
+EXPOSE port
+
 ENTRYPOINT python /pro_dir/python xx.py
 
 
 #docker build .
-#docker run -id centos:7
+#docker run -id -p 8765:ip:port centos:7
